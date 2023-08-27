@@ -19829,6 +19829,7 @@ __webpack_require__.r(__webpack_exports__);
     var drawingMode = (0,vue__WEBPACK_IMPORTED_MODULE_0__.ref)(false);
     var objects = (0,vue__WEBPACK_IMPORTED_MODULE_0__.ref)([]);
     var strokeColor = (0,vue__WEBPACK_IMPORTED_MODULE_0__.ref)('#000000');
+    var isRedoing = (0,vue__WEBPACK_IMPORTED_MODULE_0__.ref)(false);
     var addCircle = function addCircle() {
       var circle = new fabric__WEBPACK_IMPORTED_MODULE_1__.fabric.Ellipse({
         rx: 40,
@@ -19871,6 +19872,18 @@ __webpack_require__.r(__webpack_exports__);
       (_canvas$getActiveObje = canvas.getActiveObject()) === null || _canvas$getActiveObje === void 0 || _canvas$getActiveObje.set('stroke', strokeColor.value);
       canvas.requestRenderAll();
     };
+    var undo = function undo() {
+      if (canvas._objects.length > 0) {
+        objects.value.push(canvas._objects.pop());
+        canvas.renderAll();
+      }
+    };
+    var redo = function redo() {
+      if (objects.value.length > 0) {
+        isRedoing.value = true;
+        canvas.add(objects.value.pop());
+      }
+    };
     (0,vue__WEBPACK_IMPORTED_MODULE_0__.onMounted)(function () {
       // Canvas 요소 가져오기
       canvas = new fabric__WEBPACK_IMPORTED_MODULE_1__.fabric.Canvas(canvasRef.value);
@@ -19906,8 +19919,20 @@ __webpack_require__.r(__webpack_exports__);
         }
         canvas.requestRenderAll(); // 화면 업데이트 요청
       });
-    });
 
+      canvas.on('object:added', function () {
+        // canvas.isDrawingMode = true;
+        if (!isRedoing.value) {
+          objects.value = [];
+        }
+        isRedoing.value = false;
+      });
+
+      // 감시하고 있는 객체 배열이 변경될 때마다 canvas를 업데이트
+      (0,vue__WEBPACK_IMPORTED_MODULE_0__.watch)(objects, function () {
+        canvas.renderAll();
+      });
+    });
     return {
       canvasRef: canvasRef,
       addCircle: addCircle,
@@ -19915,7 +19940,9 @@ __webpack_require__.r(__webpack_exports__);
       drawingMode: drawingMode,
       saveObjects: saveObjects,
       strokeColor: strokeColor,
-      updateStrokeColor: updateStrokeColor
+      updateStrokeColor: updateStrokeColor,
+      undo: undo,
+      redo: redo
     };
   }
 });
@@ -19940,6 +19967,7 @@ var _hoisted_1 = {
 };
 var _hoisted_2 = {
   ref: "canvasRef",
+  id: "c",
   width: "400",
   height: "400"
 };
@@ -19964,7 +19992,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onInput: _cache[4] || (_cache[4] = function () {
       return $setup.updateStrokeColor && $setup.updateStrokeColor.apply($setup, arguments);
     })
-  }, null, 544 /* HYDRATE_EVENTS, NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $setup.strokeColor]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("canvas", _hoisted_2, null, 512 /* NEED_PATCH */)]);
+  }, null, 544 /* HYDRATE_EVENTS, NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $setup.strokeColor]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    onClick: _cache[5] || (_cache[5] = function () {
+      return $setup.undo && $setup.undo.apply($setup, arguments);
+    })
+  }, "undo"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    onClick: _cache[6] || (_cache[6] = function () {
+      return $setup.redo && $setup.redo.apply($setup, arguments);
+    })
+  }, "redo"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("canvas", _hoisted_2, null, 512 /* NEED_PATCH */)]);
 }
 
 /***/ }),

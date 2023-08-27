@@ -4,13 +4,14 @@
         <button @click="addCircle">동그라미</button>
         <button @click="saveObjects">저장</button>
         <input type="color" v-model="strokeColor" @input="updateStrokeColor" />
-        <canvas ref="canvasRef" width="400" height="400"></canvas>
-
+        <button @click="undo">undo</button>
+        <button @click="redo">redo</button>
+        <canvas ref="canvasRef" id="c" width="400" height="400"></canvas>
     </div>
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { fabric } from 'fabric';
 export default {
     setup() {
@@ -19,6 +20,7 @@ export default {
         const drawingMode = ref(false);
         const objects = ref([]);
         const strokeColor = ref('#000000');
+        const isRedoing = ref(false);
 
         const addCircle = () => {
             const circle = new fabric.Ellipse({
@@ -62,6 +64,20 @@ export default {
             canvas.requestRenderAll();
         };
 
+        const undo = () => {
+            if (canvas._objects.length > 0) {
+                objects.value.push(canvas._objects.pop());
+                canvas.renderAll();
+            }
+        };
+
+        const redo = () => {
+            if (objects.value.length > 0) {
+                isRedoing.value = true;
+                canvas.add(objects.value.pop());
+            }
+        };
+
         onMounted(() => {
             // Canvas 요소 가져오기
             canvas = new fabric.Canvas(canvasRef.value);
@@ -96,6 +112,18 @@ export default {
                 }
                 canvas.requestRenderAll(); // 화면 업데이트 요청
             });
+            canvas.on('object:added', () => {
+                // canvas.isDrawingMode = true;
+                if (!isRedoing.value) {
+                    objects.value = [];
+                }
+                isRedoing.value = false;
+            });
+
+            // 감시하고 있는 객체 배열이 변경될 때마다 canvas를 업데이트
+            watch(objects, () => {
+                canvas.renderAll();
+            });
         });
 
         return {
@@ -106,6 +134,8 @@ export default {
             saveObjects,
             strokeColor,
             updateStrokeColor,
+            undo,
+            redo,
 
         };
     }
