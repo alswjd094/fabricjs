@@ -3,6 +3,7 @@
         <button @click="addBox">사각형</button>
         <button @click="addCircle">동그라미</button>
         <button @click="saveObjects">저장</button>
+        <input type="color" v-model="strokeColor" @input="updateStrokeColor" />
         <canvas ref="canvasRef" width="400" height="400"></canvas>
 
     </div>
@@ -17,12 +18,13 @@ export default {
         let canvas = null;
         const drawingMode = ref(false);
         const objects = ref([]);
+        const strokeColor = ref('#000000');
 
         const addCircle = () => {
             const circle = new fabric.Ellipse({
                 rx: 40,
                 ry: 40,
-                stroke: 'green',
+                stroke: strokeColor.value,
                 fill: '',
                 top: 300,
                 left: 300,
@@ -38,7 +40,8 @@ export default {
                 left: 100,
                 width: 50,
                 height: 50,
-                stroke: 'red',
+                stroke: strokeColor.value,
+                strokeWidth: 3,
                 fill: '',
             });
             canvas.add(rect);
@@ -51,6 +54,12 @@ export default {
             const objectsJSON = JSON.stringify(objects.value);
             // 이제 objectsJSON을 저장하거나 다른 곳에 전송할 수 있습니다.
             console.log(objectsJSON); // 콘솔에 출력 예시
+        };
+
+        const updateStrokeColor = () => {
+            // 사용자가 선택한 선 색상을 업데이트
+            canvas.getActiveObject()?.set('stroke', strokeColor.value);
+            canvas.requestRenderAll();
         };
 
         onMounted(() => {
@@ -95,6 +104,8 @@ export default {
             addBox,
             drawingMode,
             saveObjects,
+            strokeColor,
+            updateStrokeColor,
 
         };
     }

@@ -19828,11 +19828,12 @@ __webpack_require__.r(__webpack_exports__);
     var canvas = null;
     var drawingMode = (0,vue__WEBPACK_IMPORTED_MODULE_0__.ref)(false);
     var objects = (0,vue__WEBPACK_IMPORTED_MODULE_0__.ref)([]);
+    var strokeColor = (0,vue__WEBPACK_IMPORTED_MODULE_0__.ref)('#000000');
     var addCircle = function addCircle() {
       var circle = new fabric__WEBPACK_IMPORTED_MODULE_1__.fabric.Ellipse({
         rx: 40,
         ry: 40,
-        stroke: 'green',
+        stroke: strokeColor.value,
         fill: '',
         top: 300,
         left: 300
@@ -19848,7 +19849,8 @@ __webpack_require__.r(__webpack_exports__);
         left: 100,
         width: 50,
         height: 50,
-        stroke: 'red',
+        stroke: strokeColor.value,
+        strokeWidth: 3,
         fill: ''
       });
       canvas.add(rect);
@@ -19863,6 +19865,12 @@ __webpack_require__.r(__webpack_exports__);
       console.log(objectsJSON); // 콘솔에 출력 예시
     };
 
+    var updateStrokeColor = function updateStrokeColor() {
+      var _canvas$getActiveObje;
+      // 사용자가 선택한 선 색상을 업데이트
+      (_canvas$getActiveObje = canvas.getActiveObject()) === null || _canvas$getActiveObje === void 0 || _canvas$getActiveObje.set('stroke', strokeColor.value);
+      canvas.requestRenderAll();
+    };
     (0,vue__WEBPACK_IMPORTED_MODULE_0__.onMounted)(function () {
       // Canvas 요소 가져오기
       canvas = new fabric__WEBPACK_IMPORTED_MODULE_1__.fabric.Canvas(canvasRef.value);
@@ -19905,7 +19913,9 @@ __webpack_require__.r(__webpack_exports__);
       addCircle: addCircle,
       addBox: addBox,
       drawingMode: drawingMode,
-      saveObjects: saveObjects
+      saveObjects: saveObjects,
+      strokeColor: strokeColor,
+      updateStrokeColor: updateStrokeColor
     };
   }
 });
@@ -19946,7 +19956,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[2] || (_cache[2] = function () {
       return $setup.saveObjects && $setup.saveObjects.apply($setup, arguments);
     })
-  }, "저장"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("canvas", _hoisted_2, null, 512 /* NEED_PATCH */)]);
+  }, "저장"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "color",
+    "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
+      return $setup.strokeColor = $event;
+    }),
+    onInput: _cache[4] || (_cache[4] = function () {
+      return $setup.updateStrokeColor && $setup.updateStrokeColor.apply($setup, arguments);
+    })
+  }, null, 544 /* HYDRATE_EVENTS, NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $setup.strokeColor]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("canvas", _hoisted_2, null, 512 /* NEED_PATCH */)]);
 }
 
 /***/ }),
